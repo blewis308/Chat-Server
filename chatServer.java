@@ -1,5 +1,4 @@
 /*
-
     For more up-to-date info, check the Discord or your email.
 
     General Goal:
@@ -20,10 +19,62 @@
 
     Server will respond by sending this same format to all clients (including
     the sender) and will append the senders username to the beginning of <message>
-
-
 */  
 
-public class chatServer {
+import java.io.*;
+import java.net.*;
 
+public class Client
+{
+    Socket socket;
+    InetAddress IP;
+    int PORT;
+    String username;
+    
+    Client(Socket socket)
+    {
+        this.socket = socket;
+        PORT = socket.getPort();
+        IP = socket.getLocalAddress();
+    }
+}
+
+public class chatServer extends Thread{
+    public static int PORT = 9000;
+    public static int BACKLOG = 5;
+    
+    Socket clsocket;
+
+    public static void main(String args[])
+    {
+        try
+        {
+            ServerSocket serverSocket = new ServerSocket(PORT, BACKLOG);
+            while(true)
+            {
+                Socket socket = serverSocket.accept();
+                Client user = new Client(socket);
+                user.start();
+            }
+        }
+        catch (Exception exception)
+        {
+            System.err.println(exception);
+            System.exit(1);
+            return;
+        }
+    }
+    
+    public void run()
+    {
+        try 
+        {
+            Client user = new Client(this.clsocket);
+        }
+        catch (Exception e)
+        {
+            System.err.println(e);
+            System.exit(1);
+        }
+    }
 }
