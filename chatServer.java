@@ -13,7 +13,7 @@
     Join -      <0> <len of name> <username>
     Leave -     <1> <null> <null>
     Talk -      <2> <len of message> <message>
-    List -      <3> 
+    List -      <3> <here is a change>
     Direct -    <4> 
     Error -     <5> 
 
