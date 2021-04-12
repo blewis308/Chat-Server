@@ -24,21 +24,6 @@
 import java.io.*;
 import java.net.*;
 
-public class Client
-{
-    Socket socket;
-    InetAddress IP;
-    int PORT;
-    String username;
-    
-    Client(Socket socket)
-    {
-        this.socket = socket;
-        PORT = socket.getPort();
-        IP = socket.getLocalAddress();
-    }
-}
-
 public class chatServer extends Thread{
     public static int PORT = 9000;
     public static int BACKLOG = 5;
