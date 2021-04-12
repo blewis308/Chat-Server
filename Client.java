@@ -1,6 +1,6 @@
 import java.util.*;
 
-class Client
+class Client extends Thread
 {
     Socket socket;
     InetAddress IP;
@@ -16,5 +16,12 @@ class Client
         IP = socket.getLocalAddress();
         input = new PrintWriter(this.socket.getOutputStream());
         output = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
+    }
+    
+    public void run()
+    {
+        try{
+            System.out.println("in run method.");
+        }
     }
 }
