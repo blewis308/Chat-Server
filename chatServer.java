@@ -13,7 +13,7 @@
     Join -      <0> <len of name> <username>
     Leave -     <1> <null> <null>
     Talk -      <2> <len of message> <message>
-    List -      <3> 
+    List -      <3> <here is a change>
     Direct -    <4> 
     Error -     <5> 
 
@@ -23,21 +23,7 @@
 
 import java.io.*;
 import java.net.*;
-
-public class Client
-{
-    Socket socket;
-    InetAddress IP;
-    int PORT;
-    String username;
-    
-    Client(Socket socket)
-    {
-        this.socket = socket;
-        PORT = socket.getPort();
-        IP = socket.getLocalAddress();
-    }
-}
+import java.util.*;
 
 public class chatServer extends Thread{
     public static int PORT = 9000;
