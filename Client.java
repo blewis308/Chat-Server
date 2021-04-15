@@ -1,8 +1,8 @@
-import java.util.*;
-import java.io.*;
 import java.net.*;
+import java.io.*;
+import java.util.*;
 
-class Client extends Thread
+class Client
 {
     Socket socket;
     InetAddress IP;
@@ -18,12 +18,5 @@ class Client extends Thread
         IP = socket.getLocalAddress();
         input = new PrintWriter(this.socket.getOutputStream());
         output = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
-    }
-    
-    public void run()
-    {
-        try{
-            System.out.println("in run method.");
-        }
     }
 }
