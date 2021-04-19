@@ -13,6 +13,11 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
 public class Gui extends JFrame{
+    //Stores the text the user inputs into the textbox
+    private String fromUser = "";
+    private boolean hasText = false;
+
+    //Creates a new Gui
     public Gui() {
         super("Java Chat Client");
 
@@ -35,6 +40,7 @@ public class Gui extends JFrame{
 
         // Text area is not editable
         textArea.setEditable(false);
+
 
         // A vertical scroll bar on our pane, as text is added to it
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
@@ -93,22 +99,14 @@ public class Gui extends JFrame{
         this.setSize(500,500);
         this.setVisible(true);
 
-
         userInputField.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent event){
                 //get the text from the textfield
-                String fromUser = userInputField.getText();
-                String Username = userInputField.getText();
+                this.fromUser = userInputField.getText();
+                this.hasText = true;
 
-                if (fromUser != null) {
-                    //append the text from the user
-                    textArea.append(Username + ":" + fromUser + "\n");
-
-                    //The pane auto-scrolls with each new response added
-                    textArea.setCaretPosition(textArea.getDocument().getLength());
-                    //Reset the text field to "" each time the user presses Enter
-                    userInputField.setText("");
-                }
+                //Reset the text field to "" each time the user presses Enter
+                userInputField.setText("");
             }
         });
 
@@ -123,6 +121,28 @@ public class Gui extends JFrame{
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setResizable(true);
         this.setVisible(true);
+    }
+
+    public String inputReceived(){
+        if (this.hasText == false){
+            return "";
+        }
+        else {
+            this.hasText = false;
+            return this.fromUser;
+        }
+    }
+
+    public boolean printToGui(String output){
+        if (output != null) {
+            textArea.append(output);
+            //The pane auto-scrolls with each new response added
+            textArea.setCaretPosition(textArea.getDocument().getLength());
+            return true;
+        }
+        else {
+            return false;
+        }
     }
 
     //public static void main(String[] args) {

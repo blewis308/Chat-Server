@@ -65,6 +65,10 @@ public class ChatClient {
             String svrMsg = "";
             boolean done = false;
             OutputThread outputToScreen;
+            Gui thisGui;
+
+            //Start gui
+            thisGui = new Gui();
 
             //Get command list from the server and print it
 
