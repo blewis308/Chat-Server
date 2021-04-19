@@ -63,4 +63,31 @@ public class ChatServer extends Thread{
             System.exit(1);
         }
     }
+
+    /*
+    Need method to parse the commands from the client
+    Maybe have it take the data from the client as input then run the command variable through a switch statement?
+    The switch could send it to a method to actually deal with it. This might be too insignificant to have a whole method for each command
+
+     */
+    public void parseCommand(byte commandNumber, short messageLength, String message){
+
+        switch (commandNumber){
+            case 0: //join
+
+                break;
+            case 1: //leave
+
+                break;
+            case 2: //talk
+
+                break;
+            case 3: //list
+                //This space intentionally left blank until implemented
+            case 4: //direct
+                //This space intentionally left blank until implemented
+            default: //error
+
+        }
+    }
 }
