@@ -151,7 +151,7 @@ public class ChatClient {
 
 }
 
-class OutputThread extendsThread {
+class OutputThread extends Thread {
     private Thread thread;
     private String threadName;
     private DataInputStream serverOutput;
