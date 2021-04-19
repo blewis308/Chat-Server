@@ -62,6 +62,8 @@ public class ChatClient {
             ByteBuffer byteOutput;
             byte tempByte;
             String svrMsg = "";
+            boolean done = false;
+            OutputThread outputToScreen;
 
             //Get command list from the server and print it
 
@@ -80,19 +82,73 @@ public class ChatClient {
                 }
             }
 
-            //Infinite loop to accept input and process it. Will be broken out of when client leaves
-            while (true){
+            //Now start receiving messages from the server
+            outputToScreen = new OutputThread("client", inputStream);
+
+            //Accept and process input.
+            while (!done){
                 message = stdin.nextLine();
+                done = processInput(message, outputStream, inputStream);
             }
 
 
-            //server.close();
+            server.close();
         } catch (Exception ex) {
             System.err.println(ex);
             System.err.println(ex.getMessage());
             System.exit(1);
         }
 
+    }
+
+    private static boolean processInput(String input, DataOutputStream outputStream, DataInputStream inputStream){
+        int i = 0;
+        if (input == null){
+            return false;
+        }
+        while (Character.isWhitespace(input.charAt(i))){
+            i++;
+        }
+        //If the first non-whitespace char is a '/', then this is a command string
+        if (input.charAt(i) == '/'){
+            i++;
+            switch (input.charAt(i)){
+                case 'a':
+                    //sendMessage(LIST, null, null, outputStream);
+                    break;
+                case 'w':
+                    //sendMessage(DIRECT, (short)input.length(), input, outputStream);
+                    break;
+                default:
+                    sendMessage(TALK, (short)input.length(), input, outputStream);
+            }
+        }
+        else {
+            sendMessage(TALK, (short)input.length(), input, outputStream);
+        }
+
+        return true;
+    }
+
+    private static boolean sendMessage(byte command, short msgLen, String message, DataOutputStream outputStream){
+        byte[] msg;
+        ByteBuffer bytePkg;
+        try {
+            //Three bytes for header, then however many needed for the actual data
+            bytePkg = ByteBuffer.allocate(3 + msgLen);
+            //Pack the information: both header and data
+            bytePkg.put(command);
+            bytePkg.putShort(msgLen);
+            msg = stringToAscii(message);
+            bytePkg.put(msg);
+            //Send to the server
+            outputStream.write(bytePkg.array());
+        } catch (Exception e){
+            System.err.println(e);
+            return false;
+        }
+
+        return true;
     }
 
     private static boolean joinServer(String username, DataOutputStream outputStream, DataInputStream inputStream){
@@ -160,7 +216,12 @@ public class ChatClient {
 
     //makes sure the string bytes are translated from US-ASII - written by Tanner Waters
     private static byte[] stringToAscii(String paramString) throws UnsupportedEncodingException {
-        return paramString.getBytes("US-ASCII");
+        if (paramString != null){
+            return paramString.getBytes("US-ASCII");
+        }
+        else {
+            return new byte[1];
+        }
     }
 
 }
