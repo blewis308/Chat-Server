@@ -72,12 +72,17 @@ public class ChatServer extends Thread{
      */
     public void parseCommand(byte commandNumber, short messageLength, String message){
 
+//        String[] splitMsg = message.split(" ");
+        String username = "";
+
         switch (commandNumber){
             case 0: //join
+                // check to see if the username is taken
+                username = message;
 
                 break;
             case 1: //leave
-
+                message = username + " disconnected.";
                 break;
             case 2: //talk
 
@@ -87,7 +92,7 @@ public class ChatServer extends Thread{
             case 4: //direct
                 //This space intentionally left blank until implemented
             default: //error
-
+                message = "Command unknown.";
         }
     }
 }
