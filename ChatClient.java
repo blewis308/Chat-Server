@@ -86,7 +86,7 @@ public class ChatClient {
             }
 
 
-            server.close();
+            //server.close();
         } catch (Exception ex) {
             System.err.println(ex);
             System.err.println(ex.getMessage());
@@ -97,24 +97,34 @@ public class ChatClient {
 
     private static boolean joinServer(String username, DataOutputStream outputStream, DataInputStream inputStream){
         ByteBuffer byteOutput;
+        byte[] msg;
+        byte tempByte;
 
-        //Pack the ByteBuffer
-        byteOutput = ByteBuffer.allocate(3+username.length());
-        byteOutput.put(JOIN);
-        byteOutput.putShort((short) username.length());
-        msg = stringToAscii(username);
-        byteOutput.put(msg);
-        //Send to the server
-        outputStream.write(byteOutput.array());
-        //Get the response
-        tempByte = inputStream.readByte();
+        try {
+            //Pack the ByteBuffer
+            byteOutput = ByteBuffer.allocate(3+username.length());
+            byteOutput.put(JOIN);
+            byteOutput.putShort((short) username.length());
+            msg = stringToAscii(username);
+            byteOutput.put(msg);
+            //Send to the server
+            outputStream.write(byteOutput.array());
+            //Get the response
+            tempByte = inputStream.readByte();
 
-        //Return true if username not already taken, false otherwise
-        if (tempByte == 0){
-            return true;
-        } else {
-            return false;
+            //Return true if username not already taken, false otherwise
+            if (tempByte == 0){
+                return true;
+            } else {
+                return false;
+            }
         }
+        catch (Exception ex){
+            System.err.println(ex);
+        }
+
+        //If we got here then something went wrong. Return false - we did not connect.
+        return false;
     }
 
     protected static void printMessages(DataInputStream dataInputStream){
@@ -123,13 +133,17 @@ public class ChatClient {
         String message;
         byte[] msgBytes;
         //Keep waiting to receive messages until the client is ready to leave the server
-        while (!leaving){
-            command = dataInputStream.readByte();
-            length = dataInputStream.readShort();
-            msgBytes = new byte[length];
-            dataInputStream.read(msgBytes, 3, length);
-            message = asciiToString(msgBytes);
-            System.out.printf("%s\n", message);
+        try{
+            while (!leaving){
+                command = dataInputStream.readByte();
+                length = dataInputStream.readShort();
+                msgBytes = new byte[length];
+                dataInputStream.read(msgBytes, 3, length);
+                message = asciiToString(msgBytes);
+                System.out.printf("%s\n", message);
+            }
+        } catch (Exception e){
+            System.err.println(e);
         }
     }
 
@@ -151,7 +165,7 @@ public class ChatClient {
 
 }
 
-class OutputThread extendsThread {
+class OutputThread extends Thread {
     private Thread thread;
     private String threadName;
     private DataInputStream serverOutput;
@@ -171,7 +185,7 @@ class OutputThread extendsThread {
 
     public void start(){
         if (thread == null){
-            thread = new Thread(this, this.threadname);
+            thread = new Thread(this, this.threadName);
             thread.start();
         }
     }
