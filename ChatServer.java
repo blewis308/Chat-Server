@@ -33,34 +33,86 @@ public class ChatServer extends Thread{
 
     public static void main(String args[])
     {
-        try
-        {
-            ServerSocket serverSocket = new ServerSocket(PORT, BACKLOG);
-            while(true)
-            {
-                Socket socket = serverSocket.accept();
-                Client user = new Client(socket);
-                user.start();
+        Server server = new Server(PORT);
+        System.out.println("starting server...");
+        server.start();
+    }
+}
+
+class Server {
+    private ArrayList<ClientThread> clients;
+    private int port = 9000; // default
+    
+    public Server(int port) {
+        this.port = port;
+        
+        clients = new ArrayList<ClientThread>();
+    }
+    
+    public void start() {
+        try {
+            ServerSocket ss = new ServerSocket(port);
+            System.out.println("server started, waiting for client...");
+            while(true) {
+                Socket socket = ss.accept();
+                System.out.println("client accepted...");
+                ClientThread client = new ClientThread(socket);
+                clients.add(client);
+                client.start();
             }
         }
-        catch (Exception exception)
-        {
-            System.err.println(exception);
-            System.exit(1);
-            return;
+        catch (IOException e) {
+            System.err.println("Exception in server: " + e);
         }
     }
+}
 
-    public void run()
+class ClientThread extends Thread {
+    Socket socket;
+    DataInputStream dataIn;
+    DataOutputStream dataOut;
+    
+    String username;
+    
+    int command;
+    byte[] msgLen = new byte[2];
+    byte[] msgData;
+    
+    public ClientThread(Socket socket)
     {
-        try
-        {
-            Client user = new Client(this.clsocket);
+        this.socket = socket;
+        try {
+            dataIn = new DataInputStream(socket.getInputStream());
+            dataOut = new DataOutputStream(socket.getOutputStream());
+            
+            while(true) {
+                dataIn.read();
+                command = dataIn.readByte();
+                
+                if(command != 3) {
+                    
+                }
+                
+                switch(command)
+                {
+                    case 0: // join
+                        break;
+                    case 1: // leave
+                        break;
+                    case 2: // talk
+                        break;
+                    case 3: // list
+                        break;
+                    case 4: // direct
+                        break;
+                    case 5: // error / default
+                    default: // default
+                        break;
+                }
+            }
         }
-        catch (Exception e)
-        {
-            System.err.println(e);
-            System.exit(1);
+        catch (IOException e) {
+            System.err.println("Exception in Client thread: " + e);
         }
     }
 }
