@@ -33,13 +33,14 @@ public class ChatServer extends Thread{
 
     public static void main(String args[])
     {
-        
+        Server server = new Server(PORT);
+        server.start();
     }
 }
 
 class Server {
     private ArrayList<ClientThread> clients;
-    private int port = 9000;
+    private int port = 9000; // default
     
     public Server(int port) {
         this.port = port;
