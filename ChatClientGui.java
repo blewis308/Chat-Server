@@ -33,7 +33,7 @@ import java.net.*;
 import java.nio.*;
 
 
-public class ChatClient {
+public class ChatClientGui {
     public static final int PORT = 9000;
     static final byte JOIN = 0;
     static final byte LEAVE = 1;
