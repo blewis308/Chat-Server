@@ -75,15 +75,15 @@ public class ChatClientGui {
 
             //Join request
             while (!usernameAccepted){
-                System.out.printf("Please enter the username you would like to use: ");
-                username = stdin.nextLine();
+                thisGui.printToGui("Please enter the username you would like to use: \n");
+                username = thisGui.inputReceived();
 
                 //Join the server and check the response.
                 if (joinServer(username, outputStream, inputStream)){
                     usernameAccepted = true;
-                    System.out.printf("Username accepted.\n");
+                    thisGui.printToGui("Username accepted.\n");
                 } else {
-                    System.out.printf("That username is already taken.\n");
+                    thisGui.printToGui("That username is already taken.\n");
                 }
             }
 
@@ -92,7 +92,15 @@ public class ChatClientGui {
 
             //Accept and process input.
             while (!done){
-                message = stdin.nextLine();
+                message = thisGui.inputReceived();
+                if (message == ""){
+                    done = false;
+                    continue;
+                }
+                else if (message == null){
+                    done = false;
+                    continue;
+                }
                 done = processInput(message, outputStream, inputStream);
             }
 
@@ -188,7 +196,7 @@ public class ChatClientGui {
         return false;
     }
 
-    protected static void printMessages(DataInputStream dataInputStream){
+    protected static void printMessages(DataInputStream dataInputStream, Gui theGui){
         byte command;
         short length;
         String message;
@@ -201,7 +209,7 @@ public class ChatClientGui {
                 msgBytes = new byte[length];
                 dataInputStream.read(msgBytes, 3, length);
                 message = asciiToString(msgBytes);
-                System.out.printf("%s\n", message);
+                theGui.printToGui(message);
             }
         } catch (Exception e){
             System.err.println(e);
