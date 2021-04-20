@@ -39,7 +39,7 @@ public class ChatServer extends Thread{
 }
 
 class Server {
-    private ArrayList<ClientThread> clients;
+    public ArrayList<ClientThread> clients;
     private int port = 9000; // default
     
     public Server(int port) {
@@ -93,23 +93,39 @@ class ClientThread extends Thread {
                 switch(command)
                 {
                     case 0: // join
+
                         break;
                     case 1: // leave
                         break;
                     case 2: // talk
                         break;
                     case 3: // list
-                        break;
+
                     case 4: // direct
-                        break;
+
                     case 5: // error / default
                     default: // default
-                        break;
+
                 }
             }
         }
         catch (IOException e) {
             System.err.println("Exception in Client thread: " + e);
         }
+    }
+
+    public void joinServer(){
+
+
+
+        String message = this.username + " connected.";
+    }
+
+    public void leave(){
+
+    }
+
+    public void talk(){
+
     }
 }
