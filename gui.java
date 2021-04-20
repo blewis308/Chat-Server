@@ -16,15 +16,16 @@ public class Gui extends JFrame{
     //Stores the text the user inputs into the textbox
     private String fromUser = "";
     private boolean hasText = false;
+    private JTextArea textArea;
 
     //Creates a new Gui
     public Gui() {
         super("Java Chat Client");
 
         // Create a TextArea object
-        final JTextArea textArea = new JTextArea(5, 30);
+        textArea = new JTextArea(50, 30);
         // Put the TextArea object in a Scrollable Pane
-        JScrollPane scrollPane = new JScrollPane(textArea);
+        JScrollPane scrollPane = new JScrollPane(this.textArea);
 
         // In order to ensure the scroll Pane object appears in user's window,
         // set a preferred size to it.
@@ -102,8 +103,8 @@ public class Gui extends JFrame{
         userInputField.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent event){
                 //get the text from the textfield
-                this.fromUser = userInputField.getText();
-                this.hasText = true;
+                fromUser = userInputField.getText();
+                hasText = true;
 
                 //Reset the text field to "" each time the user presses Enter
                 userInputField.setText("");
