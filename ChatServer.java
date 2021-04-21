@@ -75,8 +75,8 @@ class ClientThread extends Thread {
     String username;
     
     int command;
-    byte[] msgLen = new byte[2];
-    byte[] msgData;
+    short msgLen;
+    String msgData;
     
     public ClientThread(Socket socket)
     {
