@@ -12,35 +12,42 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
-public class gui extends JFrame{
-    public gui() {
+public class Gui extends JFrame{
+    //Stores the text the user inputs into the textbox
+    private String fromUser = "";
+    private boolean hasText = false;
+    private JTextArea textArea;
+
+    //Creates a new Gui
+    public Gui() {
         super("Java Chat Client");
-        
+
         // Create a TextArea object
-        final JTextArea textArea = new JTextArea(5, 30);
+        textArea = new JTextArea(50, 30);
         // Put the TextArea object in a Scrollable Pane
-        JScrollPane scrollPane = new JScrollPane(textArea);
-    
-        // In order to ensure the scroll Pane object appears in user's window, 
+        JScrollPane scrollPane = new JScrollPane(this.textArea);
+
+        // In order to ensure the scroll Pane object appears in user's window,
         // set a preferred size to it.
         scrollPane.setPreferredSize(new Dimension(560, 600));
-    
-        // Lines will be wrapped if they are too long to fit within the 
+
+        // Lines will be wrapped if they are too long to fit within the
         // allocated width
         textArea.setLineWrap(true);
-    
-        // Lines will be wrapped at word boundaries (whitespace) if they are 
+
+        // Lines will be wrapped at word boundaries (whitespace) if they are
         // too long to fit within the allocated width
         textArea.setWrapStyleWord(true);
-    
+
         // Text area is not editable
         textArea.setEditable(false);
-    
+
+
         // A vertical scroll bar on our pane, as text is added to it
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-    
-        // add a Text Field for user input, make sure the 
-        // text area stays on the last line as subsequent lines are 
+
+        // add a Text Field for user input, make sure the
+        // text area stays on the last line as subsequent lines are
         // added and auto-scrolls
         final JTextField userInputField = new JTextField(30);
 
@@ -79,7 +86,7 @@ public class gui extends JFrame{
             public void actionPerformed(ActionEvent event){
                 System.exit(0);
             }
-            
+
         });
 
         //add the items create to the menu bar
@@ -93,22 +100,14 @@ public class gui extends JFrame{
         this.setSize(500,500);
         this.setVisible(true);
 
-
         userInputField.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent event){
                 //get the text from the textfield
-                String fromUser = userInputField.getText();
-                String Username = userInputField.getText();
-                
-                if (fromUser != null) {
-                    //append the text from the user
-                    textArea.append(Username + ":" + fromUser + "\n");
-        
-                    //The pane auto-scrolls with each new response added
-                    textArea.setCaretPosition(textArea.getDocument().getLength());
-                    //Reset the text field to "" each time the user presses Enter
-                    userInputField.setText("");
-                }
+                fromUser = userInputField.getText();
+                hasText = true;
+
+                //Reset the text field to "" each time the user presses Enter
+                userInputField.setText("");
             }
         });
 
@@ -117,15 +116,37 @@ public class gui extends JFrame{
         this.add(userInputField, SwingConstants.CENTER);
         //adds and centers the scroll pane to the frame
         this.add(scrollPane, SwingConstants.CENTER);
-        
+
         // Set size, default close operation, resizability boolean and overall contents visibility
         this.setSize(600, 700);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.setResizable(false);
+        this.setResizable(true);
         this.setVisible(true);
     }
 
-    public static void main(String[] args) {
-        new gui();
+    public String inputReceived(){
+        if (this.hasText == false){
+            return "";
+        }
+        else {
+            this.hasText = false;
+            return this.fromUser;
+        }
     }
+
+    public boolean printToGui(String output){
+        if (output != null) {
+            textArea.append(output);
+            //The pane auto-scrolls with each new response added
+            textArea.setCaretPosition(textArea.getDocument().getLength());
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+    //public static void main(String[] args) {
+    //    new gui();
+    //}
 }

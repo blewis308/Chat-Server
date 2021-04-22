@@ -34,6 +34,7 @@ public class ChatServer extends Thread{
     public static void main(String args[])
     {
         Server server = new Server(PORT);
+        System.out.println("starting server...");
         server.start();
     }
 }
@@ -51,8 +52,10 @@ class Server {
     public void start() {
         try {
             ServerSocket ss = new ServerSocket(port);
+            System.out.println("server started, waiting for client...");
             while(true) {
                 Socket socket = ss.accept();
+                System.out.println("client accepted...");
                 ClientThread client = new ClientThread(socket);
                 clients.add(client);
                 client.start();
@@ -72,8 +75,8 @@ class ClientThread extends Thread {
     String username;
     
     int command;
-    byte[] msgLen = new byte[2];
-    byte[] msgData;
+    short msgLen;
+    String msgData;
     
     public ClientThread(Socket socket)
     {
