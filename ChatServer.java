@@ -23,6 +23,7 @@
 
 import java.io.*;
 import java.net.*;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 public class ChatServer extends Thread{
@@ -72,7 +73,7 @@ class ClientThread extends Thread {
     DataInputStream dataIn;
     DataOutputStream dataOut;
     
-    String username;
+    static ArrayList<String> usernames;
     
     int command;
     short msgLen;
@@ -96,7 +97,7 @@ class ClientThread extends Thread {
                 switch(command)
                 {
                     case 0: // join
-
+                        joinServer(msgData);
                         break;
                     case 1: // leave
                         break;
@@ -117,11 +118,30 @@ class ClientThread extends Thread {
         }
     }
 
-    public void joinServer(){
+    public void joinServer(String message){
 
+        byte[] messageLength;
 
+        boolean taken = false;
 
-        String message = this.username + " connected.";
+        for (int i = 0; i < usernames.size(); i++) {
+            if (usernames.contains(message)){
+                message = "1";
+                taken = true;
+                break;
+            }
+        }
+
+        if (!taken){
+            usernames.add(message);
+            message = "0";
+        }
+
+        messageLength = message.getBytes(StandardCharsets.US_ASCII);
+
+        msgData = message;
+        msgLen = (short)messageLength.length;
+
     }
 
     public void leave(){
