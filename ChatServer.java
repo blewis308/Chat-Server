@@ -100,8 +100,10 @@ class ClientThread extends Thread {
                         joinServer(msgData);
                         break;
                     case 1: // leave
+                        leaveServer(msgData);
                         break;
                     case 2: // talk
+                        talk(msgData);
                         break;
                     case 3: // list
 
@@ -144,11 +146,11 @@ class ClientThread extends Thread {
 
     }
 
-    public void leave(){
+    public void leaveServer(String message){
 
     }
 
-    public void talk(){
+    public void talk(String message){
 
     }
 }
