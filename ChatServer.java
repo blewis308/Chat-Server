@@ -122,7 +122,7 @@ class ClientThread extends Thread {
 
     public void joinServer(String message){
 
-        byte[] messageLength;
+        byte[] messageLength;// 
 
         boolean taken = false;
 
