@@ -11,6 +11,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
+import java.lang.*;
 
 public class Gui extends JFrame{
     //Stores the text the user inputs into the textbox
@@ -125,16 +126,20 @@ public class Gui extends JFrame{
     }
 
     public String inputReceived(){
-        if (this.hasText == false){
-            return "";
-        }
-        else {
+        try {
+            while (!this.hasText){
+                Thread.sleep(5);
+            }
             this.hasText = false;
             return this.fromUser;
+        } catch (Exception e){
+            System.err.println(e);
         }
+        return "";
     }
 
     public boolean printToGui(String output){
+        System.out.printf("Value: %s\n", output);
         if (output != null) {
             textArea.append(output);
             //The pane auto-scrolls with each new response added
