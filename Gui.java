@@ -18,6 +18,7 @@ public class Gui extends JFrame{
     private String fromUser = "";
     private boolean hasText = false;
     private JTextArea textArea;
+    private boolean disconnect = false;
 
     //Creates a new Gui
     public Gui() {
@@ -79,7 +80,8 @@ public class Gui extends JFrame{
         //if disconnect is pressed on the menu
         m2.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent event){
-                textArea.append("Disconnect pressed" + "\n");
+                disconnect = true;
+                //textArea.append("Disconnect pressed" + "\n");
             }
         });
         //if Exit is pressed on the menu
@@ -138,10 +140,25 @@ public class Gui extends JFrame{
         return "";
     }
 
+    public boolean leave(){
+        try {
+            while (!disconnect){
+                Thread.sleep(2);
+            }
+            System.err.printf("Received disconnect signal.\n");
+            return disconnect; //Should always return true if it gets here
+        } catch (Exception e){
+            System.err.println(e);
+        }
+
+        return false;
+    }
+
     public boolean printToGui(String output){
         System.out.printf("Value: %s\n", output);
         if (output != null) {
             textArea.append(output);
+            textArea.append("\n");
             //The pane auto-scrolls with each new response added
             textArea.setCaretPosition(textArea.getDocument().getLength());
             return true;

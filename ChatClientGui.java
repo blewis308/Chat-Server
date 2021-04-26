@@ -33,6 +33,7 @@ import java.net.*;
 import java.nio.*;
 
 
+
 public class ChatClientGui {
     public static final int PORT = 9000;
     static final byte JOIN = 0;
@@ -41,6 +42,7 @@ public class ChatClientGui {
     static final byte LIST = 3;
     static final byte DIRECT = 4;
     private static boolean leaving = false;
+    private static Gui thisGui;
 
 
     public static void main(String[] args){
@@ -65,10 +67,15 @@ public class ChatClientGui {
             String svrMsg = "";
             boolean done = false;
             OutputThread outputToScreen;
-            Gui thisGui;
+            LeaveThread watchLeaveCmd;
+
 
             //Start gui
             thisGui = new Gui();
+
+            //Start watching for the disconnect command
+            watchLeaveCmd = new LeaveThread("leave", server, outputStream);
+            watchLeaveCmd.start();
 
             //Get command list from the server and print it
 
@@ -89,9 +96,10 @@ public class ChatClientGui {
 
             //Now start receiving messages from the server
             outputToScreen = new OutputThread("client", inputStream);
+            outputToScreen.start();
 
             //Accept and process input.
-            while (!done){
+            while (true){
                 message = thisGui.inputReceived();
                 if (message == ""){
                     done = false;
@@ -101,11 +109,11 @@ public class ChatClientGui {
                     done = false;
                     continue;
                 }
-                done = processInput(message, outputStream, inputStream);
+                processInput(message, outputStream, inputStream);
             }
 
 
-            server.close();
+            // server.close();
         } catch (Exception ex) {
             System.err.println(ex);
             System.err.println(ex.getMessage());
@@ -114,10 +122,10 @@ public class ChatClientGui {
 
     }
 
-    private static boolean processInput(String input, DataOutputStream outputStream, DataInputStream inputStream){
+    private static void processInput(String input, DataOutputStream outputStream, DataInputStream inputStream){
         int i = 0;
         if (input == null){
-            return false;
+            return;
         }
         while (Character.isWhitespace(input.charAt(i))){
             i++;
@@ -139,8 +147,6 @@ public class ChatClientGui {
         else {
             sendMessage(TALK, (short)input.length(), input, outputStream);
         }
-
-        return true;
     }
 
     private static boolean sendMessage(byte command, short msgLen, String message, DataOutputStream outputStream){
@@ -154,6 +160,24 @@ public class ChatClientGui {
             bytePkg.putShort(msgLen);
             msg = stringToAscii(message);
             bytePkg.put(msg);
+            //Send to the server
+            outputStream.write(bytePkg.array());
+        } catch (Exception e){
+            System.err.println(e);
+            return false;
+        }
+
+        return true;
+    }
+
+    private static boolean sendMessage(byte command, DataOutputStream outputStream){
+        byte[] msg;
+        ByteBuffer bytePkg;
+        try {
+            //Three bytes for header, then however many needed for the actual data
+            bytePkg = ByteBuffer.allocate(1);
+            //Pack the information: both header and data
+            bytePkg.put(command);
             //Send to the server
             outputStream.write(bytePkg.array());
         } catch (Exception e){
@@ -196,21 +220,43 @@ public class ChatClientGui {
         return false;
     }
 
-    protected static void printMessages(DataInputStream dataInputStream, Gui theGui){
+    protected static void printMessages(DataInputStream dataInputStream){
         byte command;
         short length;
         String message;
         byte[] msgBytes;
         //Keep waiting to receive messages until the client is ready to leave the server
         try{
-            while (!leaving){
+            while (true){
                 command = dataInputStream.readByte();
                 length = dataInputStream.readShort();
                 msgBytes = new byte[length];
-                dataInputStream.read(msgBytes, 3, length);
+                dataInputStream.read(msgBytes, 0, length);
                 message = asciiToString(msgBytes);
-                theGui.printToGui(message);
+                //System.out.println(message);
+                thisGui.printToGui(message);
             }
+        } catch (Exception e){
+            System.err.println(e);
+        }
+    }
+
+    protected static void watchLeave(){
+        try {
+            //Blocks until the disconnect signal is sent
+            System.out.printf("Thread started watching for leave.\n");
+            thisGui.leave();
+
+        } catch (Exception e){
+            System.err.println(e);
+        }
+    }
+
+    protected static void closeOut(Socket server, DataOutputStream outputStream){
+        try {
+            sendMessage(LEAVE, outputStream);
+            server.close();
+
         } catch (Exception e){
             System.err.println(e);
         }
@@ -251,7 +297,38 @@ class OutputThread extends Thread {
 
     public void run(){
         try {
-            ChatClient.printMessages(this.serverOutput);
+            ChatClientGui.printMessages(this.serverOutput);
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+
+    public void start(){
+        if (thread == null){
+            thread = new Thread(this, this.threadName);
+            thread.start();
+        }
+    }
+
+}
+
+class LeaveThread extends Thread {
+    private Thread thread;
+    private String threadName;
+    private DataOutputStream outputStream;
+    private Socket server;
+
+    LeaveThread(String name, Socket serverSock, DataOutputStream outstream){
+        this.threadName = name;
+        this.server = serverSock;
+        this.outputStream = outstream;
+    }
+
+    public void run(){
+        try {
+            System.err.printf("Running watch thread.\n");
+            ChatClientGui.watchLeave();
+            ChatClientGui.closeOut(this.server, this.outputStream);
         } catch (Exception e) {
             System.out.println(e);
         }
