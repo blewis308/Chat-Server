@@ -1,6 +1,7 @@
 import java.io.*;
 import java.net.*;
-import java.nio.charset.StandardCharsets;
+import java.nio.*;
+import java.nio.charset.*;
 import java.util.*;
 
 public class ClientThread extends Thread {
@@ -9,6 +10,7 @@ public class ClientThread extends Thread {
     DataOutputStream dataOut;
     int usernameIndex;
     int clientIndex;
+    byte[] out;
     
 //    static ArrayList<String> usernames = new ArrayList<>();
     
@@ -58,7 +60,7 @@ public class ClientThread extends Thread {
         }
     }
 
-    void joinServer(String message){
+    void joinServer(String message) throws IOException {
 
         boolean taken = false;
         
@@ -66,7 +68,8 @@ public class ClientThread extends Thread {
             if(Server.usernames.contains(message))
             {
                 command = 1;
-                // send command byte back to client
+                out = new byte[]{command};
+                dataOut.write(out);
 
                 taken = true;
                 break;
@@ -76,7 +79,8 @@ public class ClientThread extends Thread {
         if (!taken){
             Server.usernames.add(message);
             command = 0;
-            // send command byte back to client
+            out = new byte[]{command};
+            dataOut.write(out);
 
             usernameIndex = Server.usernames.size()-1;
             talk("- "+Server.usernames.get(usernameIndex)+" connected -");
@@ -90,12 +94,49 @@ public class ClientThread extends Thread {
     }
 
     public void talk(String message){
+        byte command = 2;
+        byte[] msgData = message.getBytes();
+        short msgLen = Short.valueOf(message);
+        sendMessage(command, msgLen, message);
+    }
+    
+    public boolean sendMessage(byte command, short msgLen, String message){
+        byte[] msg;
+        ByteBuffer bytePkg;
+        try {
+            //Three bytes for header, then however many needed for the actual data
+            bytePkg = ByteBuffer.allocate(3 + msgLen);
+            //Pack the information: both header and data
+            bytePkg.put(command);
+            bytePkg.putShort(msgLen);
+            msg = stringToAscii(message);
+            bytePkg.put(msg);
+            //Send to the server
+            dataOut.write(bytePkg.array());
+        } catch (Exception e){
+            System.err.println(e);
+            return false;
+        }
 
-        byte[] messageLength;
+        return true;
+    }
+    
+    public String asciiToString(byte[] PAB) {
+        if (PAB == null || PAB.length == 0)
+        return "";
+        char[] arrayOfChar = new char[PAB.length];
+        for (byte b = 0; b < PAB.length; b++) {
+            arrayOfChar[b] = (char)PAB[b];
+        }
+        return new String(arrayOfChar);
+    }
 
-        messageLength = message.getBytes(StandardCharsets.US_ASCII);
-
-        msgData = message;
-        msgLen = (short)messageLength.length;
+    public byte[] stringToAscii(String paramString) throws UnsupportedEncodingException {
+        if (paramString != null){
+            return paramString.getBytes("US-ASCII");
+        }
+        else {
+            return new byte[1];
+        }
     }
 }
