@@ -68,12 +68,9 @@ public class Gui extends JFrame{
         //add listener to menu items
         m1.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent event){
-                textArea.append("Welcome to the java chat client." + "\n");
-                textArea.append("Enter a message in the text box to set up your username, connect to a server, or chat with others." + "\n");
-                textArea.append("There are also a couple different commands you can use." + "\n");
-                textArea.append("/w[username] (your mesage here) will allow you to send a message to a specific user." + "\n");
-                textArea.append("/all will display all the users in the chat room currently. " + "\n");
-                textArea.append("Selecting disconnect from the menu will disconnect you from the server but allow you to connect to another one." + "\n");
+                textArea.append("Welcome to the Java Chat Client." + "\n");
+                textArea.append("Enter a message in the text box and press enter to send." + "\n");
+                textArea.append("Selecting disconnect from the menu will disconnect you from the server and close the client." + "\n");
                 textArea.append("Selecting Exit will exit the Java Chat Client " + "\n");
             }
         });
@@ -130,8 +127,9 @@ public class Gui extends JFrame{
     public String inputReceived(){
         try {
             while (!this.hasText){
-                Thread.sleep(5);
+                Thread.sleep(1);
             }
+            System.err.printf("Got text.\n");
             this.hasText = false;
             return this.fromUser;
         } catch (Exception e){
@@ -167,8 +165,4 @@ public class Gui extends JFrame{
             return false;
         }
     }
-
-    //public static void main(String[] args) {
-    //    new gui();
-    //}
 }

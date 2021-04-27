@@ -12,7 +12,7 @@
 
     (Client-side)
     Join - <0><Length of name><Username>
-    The server will reply with message set to: 0 - accepted, 1 - name taken, based on the availability of the username with each attempt until one succeeds.
+    The server will reply with a single byte set to: 0 - accepted, 1 - name taken, based on the availability of the username with each attempt until one succeeds.
     Leave - <1><Length><Message>
     Tells the server that the client is disconnecting.
     Talk - <2><Length of Message><Message>
@@ -41,6 +41,7 @@ public class ChatClientGui {
     static final byte TALK = 2;
     static final byte LIST = 3;
     static final byte DIRECT = 4;
+    static final byte ERROR = 5;
     private static boolean leaving = false;
     private static Gui thisGui;
 
@@ -84,13 +85,15 @@ public class ChatClientGui {
             while (!usernameAccepted){
                 thisGui.printToGui("Please enter the username you would like to use: \n");
                 username = thisGui.inputReceived();
+                System.out.printf("Username: %s\n", username);
 
                 //Join the server and check the response.
                 if (joinServer(username, outputStream, inputStream)){
                     usernameAccepted = true;
+                    System.err.printf("Username accepted.\n");
                     thisGui.printToGui("Username accepted.\n");
                 } else {
-                    thisGui.printToGui("That username is already taken.\n");
+                    thisGui.printToGui("Username " + username + " is already taken.\n");
                 }
             }
 
@@ -135,13 +138,14 @@ public class ChatClientGui {
             i++;
             switch (input.charAt(i)){
                 case 'a':
-                    //sendMessage(LIST, null, null, outputStream);
+                    sendMessage(LIST, outputStream);
                     break;
                 case 'w':
-                    //sendMessage(DIRECT, (short)input.length(), input, outputStream);
+                    sendMessage(DIRECT, (short)input.length(), input, outputStream);
                     break;
                 default:
                     sendMessage(TALK, (short)input.length(), input, outputStream);
+                    break;
             }
         }
         else {
@@ -202,6 +206,7 @@ public class ChatClientGui {
             byteOutput.put(msg);
             //Send to the server
             outputStream.write(byteOutput.array());
+            System.out.printf("Sent data.\n");
             //Get the response
             tempByte = inputStream.readByte();
 
@@ -220,7 +225,7 @@ public class ChatClientGui {
         return false;
     }
 
-    protected static void printMessages(DataInputStream dataInputStream){
+    protected static void getMessages(DataInputStream dataInputStream){
         byte command;
         short length;
         String message;
@@ -233,8 +238,15 @@ public class ChatClientGui {
                 msgBytes = new byte[length];
                 dataInputStream.read(msgBytes, 0, length);
                 message = asciiToString(msgBytes);
-                //System.out.println(message);
-                thisGui.printToGui(message);
+                if (command == JOIN || command == TALK){
+                    thisGui.printToGui(message);
+                }
+                else if (command == LIST){
+                    thisGui.printToGui("Connected Users: " + message);
+                }
+                else if (command == ERROR){
+                    thisGui.printToGui("There was an error processing: " + message);
+                }
             }
         } catch (Exception e){
             System.err.println(e);
@@ -244,7 +256,6 @@ public class ChatClientGui {
     protected static void watchLeave(){
         try {
             //Blocks until the disconnect signal is sent
-            System.out.printf("Thread started watching for leave.\n");
             thisGui.leave();
 
         } catch (Exception e){
@@ -256,6 +267,7 @@ public class ChatClientGui {
         try {
             sendMessage(LEAVE, outputStream);
             server.close();
+            System.exit(0);
 
         } catch (Exception e){
             System.err.println(e);
@@ -297,7 +309,7 @@ class OutputThread extends Thread {
 
     public void run(){
         try {
-            ChatClientGui.printMessages(this.serverOutput);
+            ChatClientGui.getMessages(this.serverOutput);
         } catch (Exception e) {
             System.out.println(e);
         }
