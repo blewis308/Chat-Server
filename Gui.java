@@ -127,8 +127,9 @@ public class Gui extends JFrame{
     public String inputReceived(){
         try {
             while (!this.hasText){
-                Thread.sleep(5);
+                Thread.sleep(1);
             }
+            System.err.printf("Got text.\n");
             this.hasText = false;
             return this.fromUser;
         } catch (Exception e){
@@ -164,8 +165,4 @@ public class Gui extends JFrame{
             return false;
         }
     }
-
-    //public static void main(String[] args) {
-    //    new gui();
-    //}
 }

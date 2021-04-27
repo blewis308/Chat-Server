@@ -85,13 +85,15 @@ public class ChatClientGui {
             while (!usernameAccepted){
                 thisGui.printToGui("Please enter the username you would like to use: \n");
                 username = thisGui.inputReceived();
+                System.out.printf("Username: %s\n", username);
 
                 //Join the server and check the response.
                 if (joinServer(username, outputStream, inputStream)){
                     usernameAccepted = true;
+                    System.err.printf("Username accepted.\n");
                     thisGui.printToGui("Username accepted.\n");
                 } else {
-                    thisGui.printToGui("That username is already taken.\n");
+                    thisGui.printToGui("Username " + username + " is already taken.\n");
                 }
             }
 
@@ -139,7 +141,7 @@ public class ChatClientGui {
                     sendMessage(LIST, outputStream);
                     break;
                 case 'w':
-                    //sendMessage(DIRECT, (short)input.length(), input, outputStream);
+                    sendMessage(DIRECT, (short)input.length(), input, outputStream);
                     break;
                 default:
                     sendMessage(TALK, (short)input.length(), input, outputStream);
@@ -204,6 +206,7 @@ public class ChatClientGui {
             byteOutput.put(msg);
             //Send to the server
             outputStream.write(byteOutput.array());
+            System.out.printf("Sent data.\n");
             //Get the response
             tempByte = inputStream.readByte();
 
@@ -265,7 +268,7 @@ public class ChatClientGui {
             sendMessage(LEAVE, outputStream);
             server.close();
             System.exit(0);
-            
+
         } catch (Exception e){
             System.err.println(e);
         }
