@@ -9,28 +9,30 @@ public class ClientThread extends Thread {
     DataOutputStream dataOut;
     int usernameIndex;
     int clientIndex;
-    
+
 //    static ArrayList<String> usernames = new ArrayList<>();
-    
-    int command;
+
+    byte command;
     short msgLen;
     String msgData;
-    
+
     public ClientThread(Socket socket)
     {
         this.socket = socket;
         try {
             dataIn = new DataInputStream(socket.getInputStream());
             dataOut = new DataOutputStream(socket.getOutputStream());
-            
+
             while(true) {
                 dataIn.read();
                 command = dataIn.readByte();
-                
+
                 if(command != 3) {
-                    
+
                 }
-                
+
+                //Get the username index
+
                 switch(command)
                 {
                     case 0: // join
@@ -40,7 +42,7 @@ public class ClientThread extends Thread {
                         leaveServer(msgData);
                         break;
                     case 2: // talk
-                        talk(msgData);
+                        talk("["+Server.usernames.get(usernameIndex)+"] "+ msgData);
                         break;
                     case 3: // list
 
@@ -59,9 +61,9 @@ public class ClientThread extends Thread {
 
     void joinServer(String message){
 
-        byte[] messageLength;
+        byte[] messageInBytes;
         boolean taken = false;
-        
+
         for (int i = 0; i < Server.clients.size(); i++) {
             if(Server.usernames.contains(message))
             {
@@ -76,11 +78,11 @@ public class ClientThread extends Thread {
             command = 0;
             usernameIndex = Server.usernames.size()-1;
             msgData = "- "+Server.usernames.get(usernameIndex)+" connected -";
-            messageLength = message.getBytes(StandardCharsets.US_ASCII);
-            msgLen = (short)messageLength.length;
+            messageInBytes = message.getBytes(StandardCharsets.US_ASCII);
+            msgLen = (short)messageInBytes.length;
         }
 
-        
+
     }
 
     public void leaveServer(String message){
@@ -89,11 +91,11 @@ public class ClientThread extends Thread {
 
     public void talk(String message){
 
-        byte[] messageLength;
+        byte[] messageInBytes;
 
-        messageLength = message.getBytes(StandardCharsets.US_ASCII);
+        messageInBytes = message.getBytes(StandardCharsets.US_ASCII);
 
-        msgData = "["+Server.usernames.get(usernameIndex)+"] "+ message;
-        msgLen = (short)messageLength.length;
+        msgData = message;
+        msgLen = (short)messageInBytes.length;
     }
 }
