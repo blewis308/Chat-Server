@@ -40,7 +40,7 @@ public class ClientThread extends Thread {
                         leaveServer(msgData);
                         break;
                     case 2: // talk
-                        talk(msgData);
+                        talk("["+Server.usernames.get(usernameIndex)+"] "+ msgData);
                         break;
                     case 3: // list
 
@@ -50,6 +50,7 @@ public class ClientThread extends Thread {
                     default: // default
 
                 }
+                //send stuff back
             }
         }
         catch (IOException e) {
@@ -59,13 +60,14 @@ public class ClientThread extends Thread {
 
     void joinServer(String message){
 
-        byte[] messageLength;
         boolean taken = false;
         
         for (int i = 0; i < Server.clients.size(); i++) {
             if(Server.usernames.contains(message))
             {
                 command = 1;
+                // send command byte back to client
+
                 taken = true;
                 break;
             }
@@ -74,17 +76,17 @@ public class ClientThread extends Thread {
         if (!taken){
             Server.usernames.add(message);
             command = 0;
+            // send command byte back to client
+
             usernameIndex = Server.usernames.size()-1;
-            msgData = "- "+Server.usernames.get(usernameIndex)+" connected -";
-            messageLength = message.getBytes(StandardCharsets.US_ASCII);
-            msgLen = (short)messageLength.length;
+            talk("- "+Server.usernames.get(usernameIndex)+" connected -");
         }
 
         
     }
 
     public void leaveServer(String message){
-
+        talk("- "+Server.usernames.get(usernameIndex)+" disconnected -");
     }
 
     public void talk(String message){
@@ -93,7 +95,7 @@ public class ClientThread extends Thread {
 
         messageLength = message.getBytes(StandardCharsets.US_ASCII);
 
-        msgData = "["+Server.usernames.get(usernameIndex)+"] "+ message;
+        msgData = message;
         msgLen = (short)messageLength.length;
     }
 }
