@@ -12,7 +12,7 @@ public class ClientThread extends Thread {
     
 //    static ArrayList<String> usernames = new ArrayList<>();
     
-    int command;
+    byte command;
     short msgLen;
     String msgData;
     
