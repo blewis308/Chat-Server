@@ -4,7 +4,7 @@ import java.util.*;
 
 public class Server {
     static ArrayList<ClientThread> clients;
-    static ArrayList<String> usernames;
+    static ArrayList<String> usernames = new ArrayList<String>();
     private int port = 9000; // default
     
     public Server(int port) {
@@ -22,6 +22,7 @@ public class Server {
                 System.out.println("client accepted...");
                 ClientThread client = new ClientThread(socket);
                 clients.add(client);
+                client.usernameIndex = clients.size()-1;
                 client.start();
             }
         }

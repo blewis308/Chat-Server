@@ -7,9 +7,10 @@ public class ClientThread extends Thread {
     Socket socket;
     DataInputStream dataIn;
     DataOutputStream dataOut;
-    public String username;
+    int usernameIndex;
+    int clientIndex;
     
-    static ArrayList<String> usernames = new ArrayList<>();
+//    static ArrayList<String> usernames = new ArrayList<>();
     
     int command;
     short msgLen;
@@ -56,31 +57,29 @@ public class ClientThread extends Thread {
         }
     }
 
-    static void joinServer(String message){
+    void joinServer(String message){
 
-        byte[] messageLength;// 
-
+        byte[] messageLength;
         boolean taken = false;
         
         for (int i = 0; i < Server.clients.size(); i++) {
-            if(Server.clients.get(i).username.equals(message))
+            if(Server.usernames.contains(message))
             {
-                message = "1";
+                command = 1;
                 taken = true;
                 break;
             }
         }
 
         if (!taken){
-            usernames.add(message);
-            message = "0";
+            Server.usernames.add(message);
+            command = 0;
+            usernameIndex = Server.usernames.size()-1;
+            msgData = "- "+Server.usernames.get(usernameIndex)+" connected -";
+            messageLength = message.getBytes(StandardCharsets.US_ASCII);
+            msgLen = (short)messageLength.length;
         }
 
-        messageLength = message.getBytes(StandardCharsets.US_ASCII);
-
-        msgData = message;
-        msgLen = (short)messageLength.length;
-        
         
     }
 
@@ -90,5 +89,11 @@ public class ClientThread extends Thread {
 
     public void talk(String message){
 
+        byte[] messageLength;
+
+        messageLength = message.getBytes(StandardCharsets.US_ASCII);
+
+        msgData = "["+Server.usernames.get(usernameIndex)+"] "+ message;
+        msgLen = (short)messageLength.length;
     }
 }
