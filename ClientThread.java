@@ -102,13 +102,15 @@ public class ClientThread extends Thread {
     }
 
     public void list(){
-        String commandList = "Available Commands:\n"+
-                             "Join \n"+
-                             "Leave \n"+
-                             "Talk \n"+
-                             "List \n";
 
-        talk(commandList);
+        StringBuilder ul = new StringBuilder();
+        ul.append("Connected users: \n");
+
+        for (int i = 0; i < Server.usernames.size(); i++) {
+            ul.append(Server.usernames.get(i)+" \n");
+        }
+
+        talk(ul.toString());
     }
     
     public boolean sendMessage(byte command, short msgLen, String message){
