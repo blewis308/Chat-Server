@@ -45,7 +45,8 @@ public class ClientThread extends Thread {
                         talk("["+Server.usernames.get(usernameIndex)+"] "+ msgData);
                         break;
                     case 3: // list
-
+                        list();
+                        break;
                     case 4: // direct
 
                     case 5: // error / default
@@ -98,6 +99,16 @@ public class ClientThread extends Thread {
         byte[] msgData = message.getBytes();
         short msgLen = Short.valueOf(message);
         sendMessage(command, msgLen, message);
+    }
+
+    public void list(){
+        String commandList = "Available Commands:\n"+
+                             "Join \n"+
+                             "Leave \n"+
+                             "Talk \n"+
+                             "List \n";
+
+        talk(commandList);
     }
     
     public boolean sendMessage(byte command, short msgLen, String message){
