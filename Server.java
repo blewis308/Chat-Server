@@ -41,9 +41,9 @@ public class Server {
             buffer.putShort(msglen);
             buffer.put(message);
             
-            for(ClientThread c : clients)
+            for(int c = 0; c < clients.size(); c++)
             {
-                c.dataOut.write(buffer.array());
+                clients.get(c).dataOut.write(buffer.array());
             }
             
         } catch (Exception e) {

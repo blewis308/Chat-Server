@@ -46,6 +46,7 @@ public class ClientThread extends Thread {
                         leaveServer(msgData);
                         break;
                     case 2: // talk
+                        System.out.println("Sent a message");
                         talk("["+Server.usernames.get(usernameIndex)+"] "+ msgData);
                         break;
                     case 3: // list
@@ -102,14 +103,11 @@ public class ClientThread extends Thread {
     }
 
     public void talk(String message){
-        byte command = 2;
+        byte command = (byte)2;
         byte[] msgData = message.getBytes();
         short msgLen = (short) message.length();
 
-        for (int i = 0; i < Server.usernames.size(); i++) {// iterate through client threads and send the message to everyone
-            Server.clients.get(i).sendMessage(command, msgLen, message);
-        }
-//        sendMessage();
+        Server.sendall(command, msgLen, msgData);
     }
 
     public void list(){
