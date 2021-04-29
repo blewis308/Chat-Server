@@ -52,10 +52,10 @@ public class ClientThread extends Thread {
                         list();
                         break;
                     case 4: // direct
-
+                        direct(msgData);
                     case 5: // error / default
                     default: // default
-
+                        error();
                 }
                 //send stuff back
             }
@@ -104,8 +104,12 @@ public class ClientThread extends Thread {
     public void talk(String message){
         byte command = 2;
         byte[] msgData = message.getBytes();
-        short msgLen = (short)message.length();
-        Server.sendall(command, msgLen, msgData);
+        short msgLen = (short) message.length();
+
+        for (int i = 0; i < Server.usernames.size(); i++) {// iterate through client threads and send the message to everyone
+            Server.clients.get(i).sendMessage(command, msgLen, message);
+        }
+//        sendMessage();
     }
 
     public void list(){
@@ -117,7 +121,38 @@ public class ClientThread extends Thread {
             ul.append(Server.usernames.get(i)+" \n");
         }
 
-        talk(ul.toString());
+        msgLen = Short.valueOf(ul.toString());
+
+        sendMessage(command ,msgLen  ,ul.toString());
+    }
+
+    public void direct(String message){
+
+        String messageArray[] = message.split(" ");
+        String sendTo = messageArray[0];
+
+        message = message.replace(sendTo+" ", "");
+
+        int userIndex = 0;
+
+        for (int i = 0; i < Server.usernames.size(); i++) {
+            if (sendTo.equals(Server.usernames.get(i))){
+                userIndex = i;
+                break;
+            }
+        }
+
+        msgLen = Short.valueOf(message);
+
+        Server.clients.get(userIndex).sendMessage(command, msgLen, message);
+    }
+
+    public void error(){
+        String message = "[Error] Invalid command";
+        byte error = 5;
+        msgLen = Short.valueOf(message);
+
+        sendMessage(error, msgLen, message);
     }
     
     public boolean sendMessage(byte command, short msgLen, String message){
