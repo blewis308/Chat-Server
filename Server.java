@@ -1,10 +1,11 @@
 import java.io.*;
 import java.net.*;
+import java.nio.ByteBuffer;
 import java.util.*;
 
 public class Server {
     static ArrayList<ClientThread> clients;
-    static ArrayList<String> usernames = new ArrayList<String>();
+    static ArrayList<String> usernames = new ArrayList<>();
     private int port = 9000; // default
     
     public Server(int port) {
@@ -31,8 +32,22 @@ public class Server {
         }
     }
     
-    boolean hasUserName(String username)
+    static void sendall(byte command, short msglen, byte[] message)
     {
-        return usernames.contains(username);
+        ByteBuffer buffer;
+        try{
+            buffer = ByteBuffer.allocate(3 + msglen);
+            buffer.put(command);
+            buffer.putShort(msglen);
+            buffer.put(message);
+            
+            for(ClientThread c : clients)
+            {
+                c.dataOut.write(buffer.array());
+            }
+            
+        } catch (Exception e) {
+            System.err.println(e);
+        }
     }
 }

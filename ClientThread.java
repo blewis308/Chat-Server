@@ -16,9 +16,10 @@ public class ClientThread extends Thread {
     
     byte command;
     short msgLen;
+    byte[] msgBytes;
     String msgData;
     
-    public ClientThread(Socket socket)
+    public ClientThread(Socket socket) throws IOException
     {
         this.socket = socket;
         try {
@@ -26,14 +27,17 @@ public class ClientThread extends Thread {
             dataOut = new DataOutputStream(socket.getOutputStream());
             
             while(true) {
-                dataIn.read();
                 command = dataIn.readByte();
                 
-                if(command != 3) {
-                    
+                if(command != (byte)3)
+                {
+                    msgLen = dataIn.readShort();
+                    msgBytes = new byte[3 + Integer.valueOf(msgLen)];
+                    dataIn.read(msgBytes);
+                    msgData = asciiToString(msgBytes);
                 }
                 
-                switch(command)
+                switch((int)command)
                 {
                     case 0: // join
                         joinServer(msgData);
@@ -78,16 +82,19 @@ public class ClientThread extends Thread {
         }
 
         if (!taken){
+            System.out.println("username: " + message);
+            usernameIndex = Server.usernames.size();
             Server.usernames.add(message);
             command = 0;
             out = new byte[]{command};
             dataOut.write(out);
-
-            usernameIndex = Server.usernames.size()-1;
-            talk("- "+Server.usernames.get(usernameIndex)+" connected -");
+            
+            System.out.println("index: " + usernameIndex);
+            System.out.println(Server.usernames.get(usernameIndex));
+            String talkmsg = "- " + Server.usernames.get(usernameIndex) + " connected -";
+            
+            talk(talkmsg);
         }
-
-        
     }
 
     public void leaveServer(String message){
@@ -97,8 +104,8 @@ public class ClientThread extends Thread {
     public void talk(String message){
         byte command = 2;
         byte[] msgData = message.getBytes();
-        short msgLen = Short.valueOf(message);
-        sendMessage(command, msgLen, message);
+        short msgLen = (short)message.length();
+        Server.sendall(command, msgLen, msgData);
     }
 
     public void list(){
