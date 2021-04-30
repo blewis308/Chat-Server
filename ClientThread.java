@@ -16,24 +16,31 @@ public class ClientThread extends Thread {
     
     byte command;
     short msgLen;
+    byte[] msgBytes;
     String msgData;
     
-    public ClientThread(Socket socket)
+    public ClientThread(Socket socket) throws IOException
     {
         this.socket = socket;
+        dataIn = new DataInputStream(socket.getInputStream());
+        dataOut = new DataOutputStream(socket.getOutputStream());   
+    }
+    
+    public void run()
+    {
         try {
-            dataIn = new DataInputStream(socket.getInputStream());
-            dataOut = new DataOutputStream(socket.getOutputStream());
-            
             while(true) {
-                dataIn.read();
                 command = dataIn.readByte();
                 
-                if(command != 3) {
-                    
+                if(command != (byte)3)
+                {
+                    msgLen = dataIn.readShort();
+                    msgBytes = new byte[3 + Integer.valueOf(msgLen)];
+                    dataIn.read(msgBytes);
+                    msgData = asciiToString(msgBytes);
                 }
                 
-                switch(command)
+                switch((int)command)
                 {
                     case 0: // join
                         joinServer(msgData);
@@ -42,18 +49,18 @@ public class ClientThread extends Thread {
                         leaveServer(msgData);
                         break;
                     case 2: // talk
+                        System.out.println("Sent a message");
                         talk("["+Server.usernames.get(usernameIndex)+"] "+ msgData);
                         break;
                     case 3: // list
                         list();
                         break;
                     case 4: // direct
-
+                        direct(msgData);
                     case 5: // error / default
                     default: // default
-
+                        error();
                 }
-                //send stuff back
             }
         }
         catch (IOException e) {
@@ -64,6 +71,7 @@ public class ClientThread extends Thread {
     void joinServer(String message) throws IOException {
 
         boolean taken = false;
+        String workingCommands = "Available Commands: \n join \n leave \n talk \n list \n direct \n error \n";
         
         for (int i = 0; i < Server.clients.size(); i++) {
             if(Server.usernames.contains(message))
@@ -78,39 +86,78 @@ public class ClientThread extends Thread {
         }
 
         if (!taken){
+            //System.out.println("username: " + message);
+            usernameIndex = Server.usernames.size();
             Server.usernames.add(message);
             command = 0;
             out = new byte[]{command};
             dataOut.write(out);
+            
+            //System.out.println("index: " + usernameIndex);
+            //System.out.println(Server.usernames.get(usernameIndex));
+            String talkmsg = "- " + Server.usernames.get(usernameIndex) + " connected -";
+            
+            talk(talkmsg);
 
-            usernameIndex = Server.usernames.size()-1;
-            talk("- "+Server.usernames.get(usernameIndex)+" connected -");
+            sendMessage((byte)2,(short) workingCommands.length(), workingCommands);
         }
-
-        
     }
 
-    public void leaveServer(String message){
+    public void leaveServer(String message) throws UnsupportedEncodingException
+    {
         talk("- "+Server.usernames.get(usernameIndex)+" disconnected -");
     }
 
-    public void talk(String message){
-        byte command = 2;
-        byte[] msgData = message.getBytes();
-        short msgLen = Short.valueOf(message);
-        sendMessage(command, msgLen, message);
+    public void talk(String message) throws UnsupportedEncodingException
+    {
+        byte command = (byte)2;
+        byte[] msgData = stringToAscii(message);
+        short msgLen = (short) message.length();
+
+        Server.sendall(command, msgLen, msgData);
     }
 
     public void list(){
 
-        StringBuilder ul = new StringBuilder();
-        ul.append("Connected users: \n");
+        StringBuilder userList = new StringBuilder();
+        //userList.append("Connected users: \n");
 
         for (int i = 0; i < Server.usernames.size(); i++) {
-            ul.append(Server.usernames.get(i)+" \n");
+            userList.append(" \n" + Server.usernames.get(i));
         }
 
-        talk(ul.toString());
+        msgLen = (short) userList.toString().length();
+
+        sendMessage(command ,msgLen  ,userList.toString());
+    }
+
+    public void direct(String message){
+
+        String messageArray[] = message.split(" ");
+        String sendTo = messageArray[0];
+
+        message = message.replace(sendTo+" ", "");
+
+        int userIndex = 0;
+
+        for (int i = 0; i < Server.usernames.size(); i++) {
+            if (sendTo.equals(Server.usernames.get(i))){
+                userIndex = i;
+                break;
+            }
+        }
+
+        msgLen = (short) message.length();
+
+        Server.clients.get(userIndex).sendMessage(command, msgLen, message);
+    }
+
+    public void error(){
+        String message = "[Error] Invalid command";
+        byte error = 5;
+        msgLen = (short) message.length();
+
+        sendMessage(error, msgLen, message);
     }
     
     public boolean sendMessage(byte command, short msgLen, String message){
@@ -146,7 +193,7 @@ public class ClientThread extends Thread {
 
     public byte[] stringToAscii(String paramString) throws UnsupportedEncodingException {
         if (paramString != null){
-            return paramString.getBytes("US-ASCII");
+            return paramString.getBytes(StandardCharsets.US_ASCII);
         }
         else {
             return new byte[1];
