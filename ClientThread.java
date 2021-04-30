@@ -61,7 +61,6 @@ public class ClientThread extends Thread {
                     default: // default
                         error();
                 }
-                //send stuff back
             }
         }
         catch (IOException e) {
