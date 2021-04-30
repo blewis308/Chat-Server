@@ -71,6 +71,7 @@ public class ClientThread extends Thread {
     void joinServer(String message) throws IOException {
 
         boolean taken = false;
+        String workingCommands = "Available Commands: \n join \n leave \n talk \n list \n direct \n error \n";
         
         for (int i = 0; i < Server.clients.size(); i++) {
             if(Server.usernames.contains(message))
@@ -97,6 +98,8 @@ public class ClientThread extends Thread {
             String talkmsg = "- " + Server.usernames.get(usernameIndex) + " connected -";
             
             talk(talkmsg);
+
+            sendMessage((byte)2,Short.valueOf(workingCommands), workingCommands);
         }
     }
 
