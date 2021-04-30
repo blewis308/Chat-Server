@@ -22,7 +22,7 @@ public class Gui extends JFrame{
 
     //Creates a new Gui
     public Gui() {
-        super("Java Chat Client");
+        super("Chatter");
 
         // Create a TextArea object
         textArea = new JTextArea(50, 30);
