@@ -22,10 +22,13 @@ public class ClientThread extends Thread {
     public ClientThread(Socket socket) throws IOException
     {
         this.socket = socket;
+        dataIn = new DataInputStream(socket.getInputStream());
+        dataOut = new DataOutputStream(socket.getOutputStream());   
+    }
+    
+    public void run()
+    {
         try {
-            dataIn = new DataInputStream(socket.getInputStream());
-            dataOut = new DataOutputStream(socket.getOutputStream());
-            
             while(true) {
                 command = dataIn.readByte();
                 
@@ -98,13 +101,15 @@ public class ClientThread extends Thread {
         }
     }
 
-    public void leaveServer(String message){
+    public void leaveServer(String message) throws UnsupportedEncodingException
+    {
         talk("- "+Server.usernames.get(usernameIndex)+" disconnected -");
     }
 
-    public void talk(String message){
+    public void talk(String message) throws UnsupportedEncodingException
+    {
         byte command = (byte)2;
-        byte[] msgData = message.getBytes();
+        byte[] msgData = stringToAscii(message);
         short msgLen = (short) message.length();
 
         Server.sendall(command, msgLen, msgData);
