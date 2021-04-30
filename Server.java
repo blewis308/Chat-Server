@@ -35,22 +35,22 @@ public class Server {
     static void sendall(byte command, short msglen, byte[] message)
     {
         ByteBuffer buffer;
-        System.out.println("in sendall: " + command + " " + msglen + " " + message);
+        //System.out.println("in sendall: " + command + " " + msglen + " " + message);
         try{
             buffer = ByteBuffer.allocate(3 + msglen);
             buffer.put(command);
             buffer.putShort(msglen);
             buffer.put(message);
             
-            System.out.println("Before for loop");
-            System.out.println(clients.size());
+            //System.out.println("Before for loop");
+            //System.out.println(clients.size());
             for(int c = 0; c < clients.size(); c++)
             {
-                System.out.println("Sending data for user #" + c);
+                //System.out.println("Sending data for user #" + c);
                 clients.get(c).dataOut.write(buffer.array());
-                System.out.println("Data sent for user #" + c);
+                //System.out.println("Data sent for user #" + c);
             }
-            System.out.println("After for loop");
+            //System.out.println("After for loop");
         } catch (Exception e) {
             System.err.println(e);
         }

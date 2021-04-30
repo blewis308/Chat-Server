@@ -86,20 +86,20 @@ public class ClientThread extends Thread {
         }
 
         if (!taken){
-            System.out.println("username: " + message);
+            //System.out.println("username: " + message);
             usernameIndex = Server.usernames.size();
             Server.usernames.add(message);
             command = 0;
             out = new byte[]{command};
             dataOut.write(out);
             
-            System.out.println("index: " + usernameIndex);
-            System.out.println(Server.usernames.get(usernameIndex));
+            //System.out.println("index: " + usernameIndex);
+            //System.out.println(Server.usernames.get(usernameIndex));
             String talkmsg = "- " + Server.usernames.get(usernameIndex) + " connected -";
             
             talk(talkmsg);
 
-            sendMessage((byte)2,Short.valueOf(workingCommands), workingCommands);
+            sendMessage((byte)2,(short) workingCommands.length(), workingCommands);
         }
     }
 
@@ -120,13 +120,13 @@ public class ClientThread extends Thread {
     public void list(){
 
         StringBuilder userList = new StringBuilder();
-        userList.append("Connected users: \n");
+        //userList.append("Connected users: \n");
 
         for (int i = 0; i < Server.usernames.size(); i++) {
-            userList.append(Server.usernames.get(i)+" \n");
+            userList.append(" \n" + Server.usernames.get(i));
         }
 
-        msgLen = Short.valueOf(userList.toString());
+        msgLen = (short)userList.toString().length();
 
         sendMessage(command ,msgLen  ,userList.toString());
     }
@@ -193,7 +193,7 @@ public class ClientThread extends Thread {
 
     public byte[] stringToAscii(String paramString) throws UnsupportedEncodingException {
         if (paramString != null){
-            return paramString.getBytes("US-ASCII");
+            return paramString.getBytes(StandardCharsets.US_ASCII);
         }
         else {
             return new byte[1];
