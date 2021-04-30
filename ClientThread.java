@@ -126,7 +126,7 @@ public class ClientThread extends Thread {
             userList.append(" \n" + Server.usernames.get(i));
         }
 
-        msgLen = (short)userList.toString().length();
+        msgLen = (short) userList.toString().length();
 
         sendMessage(command ,msgLen  ,userList.toString());
     }
@@ -147,7 +147,7 @@ public class ClientThread extends Thread {
             }
         }
 
-        msgLen = Short.valueOf(message);
+        msgLen = (short) message.length();
 
         Server.clients.get(userIndex).sendMessage(command, msgLen, message);
     }
@@ -155,7 +155,7 @@ public class ClientThread extends Thread {
     public void error(){
         String message = "[Error] Invalid command";
         byte error = 5;
-        msgLen = Short.valueOf(message);
+        msgLen = (short) message.length();
 
         sendMessage(error, msgLen, message);
     }
