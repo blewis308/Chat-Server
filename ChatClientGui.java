@@ -97,9 +97,10 @@ public class ChatClientGui {
                     else {
                         thisGui.printToGui("Username " + username + " is already taken.\n");
                     }
-            }
-            else {
-                thisGui.printToGui("Username invalid. Please try again.\n");
+                }
+                else {
+                    thisGui.printToGui("Username invalid. Please try again.\n");
+                }
             }
 
             //Now start receiving messages from the server
