@@ -112,16 +112,16 @@ public class ClientThread extends Thread {
 
     public void list(){
 
-        StringBuilder ul = new StringBuilder();
-        ul.append("Connected users: \n");
+        StringBuilder userList = new StringBuilder();
+        userList.append("Connected users: \n");
 
         for (int i = 0; i < Server.usernames.size(); i++) {
-            ul.append(Server.usernames.get(i)+" \n");
+            userList.append(Server.usernames.get(i)+" \n");
         }
 
-        msgLen = Short.valueOf(ul.toString());
+        msgLen = Short.valueOf(userList.toString());
 
-        sendMessage(command ,msgLen  ,ul.toString());
+        sendMessage(command ,msgLen  ,userList.toString());
     }
 
     public void direct(String message){
