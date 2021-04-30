@@ -68,10 +68,10 @@ public class Gui extends JFrame{
         //add listener to menu items
         m1.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent event){
-                textArea.append("Welcome to the Java Chat Client." + "\n");
+                textArea.append("Welcome to Chatter your new favorite chat service." + "\n");
                 textArea.append("Enter a message in the text box and press enter to send." + "\n");
                 textArea.append("Selecting disconnect from the menu will disconnect you from the server and close the client." + "\n");
-                textArea.append("Selecting Exit will exit the Java Chat Client " + "\n");
+                textArea.append("Selecting Exit will exit Chatter. " + "\n");
             }
         });
         //if disconnect is pressed on the menu
