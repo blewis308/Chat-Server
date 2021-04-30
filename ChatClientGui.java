@@ -119,10 +119,10 @@ public class ChatClientGui {
                 }
                 processInput(message, outputStream, inputStream);
             }
-
-
+        }
+        }
             // server.close();
-        } catch (Exception ex) {
+        catch (Exception ex) {
             System.err.println(ex);
             System.err.println(ex.getMessage());
             System.exit(1);
