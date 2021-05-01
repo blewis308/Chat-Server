@@ -11,27 +11,30 @@ public class ClientThread extends Thread {
     int usernameIndex;
     int clientIndex;
     byte[] out;
-    
+
 //    static ArrayList<String> usernames = new ArrayList<>();
-    
+
     byte command;
     short msgLen;
     byte[] msgBytes;
     String msgData;
-    
+    //NEEDS TO BE THREADSAFED
+    PrintWriter logFile = new PrintWriter(new File("connectionLog.txt"));
+
     public ClientThread(Socket socket) throws IOException
     {
         this.socket = socket;
         dataIn = new DataInputStream(socket.getInputStream());
-        dataOut = new DataOutputStream(socket.getOutputStream());   
+        dataOut = new DataOutputStream(socket.getOutputStream());
+        logFile.println("Connection accepted. IP Address: " + socket.getRemoteSocketAddress() + " Port: " + socket.getPort());
     }
-    
+
     public void run()
     {
         try {
             while(true) {
                 command = dataIn.readByte();
-                
+
                 if(command != (byte)3)
                 {
                     msgLen = dataIn.readShort();
@@ -39,7 +42,7 @@ public class ClientThread extends Thread {
                     dataIn.read(msgBytes);
                     msgData = asciiToString(msgBytes);
                 }
-                
+
                 switch((int)command)
                 {
                     case 0: // join
@@ -72,7 +75,7 @@ public class ClientThread extends Thread {
 
         boolean taken = false;
         String workingCommands = "Available Commands: \n join \n leave \n talk \n list \n direct \n error \n";
-        
+
         for (int i = 0; i < Server.clients.size(); i++) {
             if(Server.usernames.contains(message))
             {
@@ -92,11 +95,11 @@ public class ClientThread extends Thread {
             command = 0;
             out = new byte[]{command};
             dataOut.write(out);
-            
+
             //System.out.println("index: " + usernameIndex);
             //System.out.println(Server.usernames.get(usernameIndex));
             String talkmsg = "- " + Server.usernames.get(usernameIndex) + " connected -";
-            
+
             talk(talkmsg);
 
             sendMessage((byte)2,(short) workingCommands.length(), workingCommands);
@@ -159,7 +162,7 @@ public class ClientThread extends Thread {
 
         sendMessage(error, msgLen, message);
     }
-    
+
     public boolean sendMessage(byte command, short msgLen, String message){
         byte[] msg;
         ByteBuffer bytePkg;
@@ -180,7 +183,7 @@ public class ClientThread extends Thread {
 
         return true;
     }
-    
+
     public String asciiToString(byte[] PAB) {
         if (PAB == null || PAB.length == 0)
         return "";
