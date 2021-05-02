@@ -4,13 +4,13 @@ import java.time.*;
 import java.io.*;
 
 public class Logger extends Thread {
-    private static PrintWriter logFile;
+    //private static PrintWriter logFile;
     private Queue<String> logQueue = new LinkedList<>();
 
     //Empty constructor
     Logger() throws FileNotFoundException{
         if (logFile == null){
-            logFile = new PrintWriter(new File("serverLog.txt"));
+            //logFile = new PrintWriter(new File("serverLog.txt"));
         }
     }
 
@@ -26,6 +26,9 @@ public class Logger extends Thread {
         catch (Exception e) {
             System.out.println(e);
         }
+        finally {
+            logFile.flush();
+        }
     }
 
     public void addLog(String logStr){
@@ -36,8 +39,16 @@ public class Logger extends Thread {
 
     private static void printLog(String logStr){
         if (logStr != null){
-            logFile.printf("%s\n", logStr);
+            System.out.printf("%s\n", logStr);
+            logFile.flush();
         }
+        else {
+            System.err.printf("logging string was null\n");
+        }
+    }
+
+    public void closePrinter(){
+        logFile.close();
     }
 
 }

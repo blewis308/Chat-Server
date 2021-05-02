@@ -7,14 +7,17 @@ public class Server {
     static ArrayList<ClientThread> clients;
     static ArrayList<String> usernames = new ArrayList<>();
     private int port = 9000; // default
-    public static Logger logKeeper = new Logger();
-    public Queue clientNumberToRemove = new LinkedList<>();
+    public static Logger logKeeper;
+    public static Queue clientNumberToRemove = new LinkedList<>();
+    private RemoveClientThread removeClientThread;
 
-    public Server(int port) {
+    public Server(int port) throws FileNotFoundException{
         this.port = port;
-
+        removeClientThread = new RemoveClientThread("Remove Client");
+        logKeeper = new Logger();
         clients = new ArrayList<ClientThread>();
         logKeeper.start();
+        removeClientThread.start();
     }
 
     public void start() {
@@ -28,19 +31,24 @@ public class Server {
                 clients.add(client);
                 client.usernameIndex = clients.size()-1;
                 client.start();
-                watchForRemove.start();
             }
         }
         catch (IOException e) {
             System.err.println("Exception in server: " + e);
         }
+        finally {
+            logKeeper.closePrinter();
+        }
     }
 
-    public void removeClient(){
+    public static void removeClient(){
         int currentNumber = -1;
+        ClientThread client;
         while (true){
             if (clientNumberToRemove.size() > 0){
-                currentNumber = clientNumberToRemove.remove();
+                client = (ClientThread)clientNumberToRemove.remove();
+                currentNumber = client.usernameIndex;
+                System.err.printf("Removing %d\n", currentNumber);
                 clients.remove(currentNumber);
                 usernames.remove(currentNumber);
             }
@@ -81,17 +89,17 @@ public class Server {
     }
 }
 
-class LeaveThread extends Thread {
+class RemoveClientThread extends Thread {
     private Thread thread;
     private String threadName;
 
-    LeaveThread(String name){
+    RemoveClientThread(String name){
         this.threadName = name;
     }
 
     public void run(){
         try {
-            System.err.printf("Running watch thread.\n");
+            System.err.printf("Running remove clients thread.\n");
             Server.removeClient();
         } catch (Exception e) {
             System.out.println(e);

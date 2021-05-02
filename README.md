@@ -36,8 +36,8 @@ To directly message a specific user, use **`/w <username> <message>`** to send a
 
 
 ## Things to note:
-**All** communications are logged; this includes direct messages too. Hate speech and non-LeTourenau appropriate messages are not tolerated. If needed, your username, IP Address, and messages will be reviewed by administration; subsequent action will be taken.
+**All** communications are logged; this includes direct messages too. Hate speech and non-LeTourneau appropriate messages are not tolerated. If needed, your username, IP Address, and messages will be reviewed by administration; subsequent action will be taken.
 
 Please report any bugs, crashes, or other unexpected behavior to an admin. Issues presented will be addressed and fixed in a timely manner.
 
-Have fun! This is a welcoming envionment; all people from every walk of life are invited with open arms!
+Have fun! This is a welcoming environment; all people from every walk of life are invited with open arms!

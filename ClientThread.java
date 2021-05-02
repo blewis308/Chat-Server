@@ -55,7 +55,6 @@ public class ClientThread extends Thread {
                     case 1: // leave
                         leaveServer(msgData);
                         return;
-                        break;
                     case 2: // talk
                         System.out.println("Sent a message");
                         talk("["+Server.usernames.get(usernameIndex)+"] "+ msgData);

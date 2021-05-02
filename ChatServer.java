@@ -31,8 +31,13 @@ public class ChatServer extends Thread{
 
     public static void main(String args[])
     {
-        Server server = new Server(PORT);
-        System.out.println("starting server...");
-        server.start();
+        try{
+            Server server = new Server(PORT);
+            System.out.println("starting server...");
+            server.start();
+        }
+        catch (Exception ex){
+            System.err.println(ex);
+        }
     }
 }

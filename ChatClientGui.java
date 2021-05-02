@@ -121,7 +121,6 @@ public class ChatClientGui {
                 processInput(message, outputStream, inputStream);
             }
         }
-        }
             // server.close();
         catch (Exception ex) {
             System.err.println(ex);
