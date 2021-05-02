@@ -3,6 +3,8 @@ import java.net.*;
 import java.nio.*;
 import java.nio.charset.*;
 import java.util.*;
+import java.time.*;
+import java.time.format.*;
 
 public class ClientThread extends Thread {
     Socket socket;
@@ -11,22 +13,24 @@ public class ClientThread extends Thread {
     int usernameIndex;
     int clientIndex;
     byte[] out;
-
-//    static ArrayList<String> usernames = new ArrayList<>();
+    DateTimeFormatter formatter =
+    DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT)
+                     .withLocale(Locale.UK)
+                     .withZone(ZoneId.systemDefault());
 
     byte command;
     short msgLen;
     byte[] msgBytes;
     String msgData;
-    //NEEDS TO BE THREADSAFED
-    PrintWriter logFile = new PrintWriter(new File("connectionLog.txt"));
+    Instant timestamp;
 
-    public ClientThread(Socket socket) throws IOException
+
+    public ClientThread(Socket socket) throws IOException, FileNotFoundException
     {
         this.socket = socket;
         dataIn = new DataInputStream(socket.getInputStream());
         dataOut = new DataOutputStream(socket.getOutputStream());
-        logFile.println("Connection accepted. IP Address: " + socket.getRemoteSocketAddress() + " Port: " + socket.getPort());
+        Server.addLog("Connection accepted. IP Address: " + socket.getRemoteSocketAddress() + " Port: " + socket.getPort());
     }
 
     public void run()
@@ -50,6 +54,7 @@ public class ClientThread extends Thread {
                         break;
                     case 1: // leave
                         leaveServer(msgData);
+                        return;
                         break;
                     case 2: // talk
                         System.out.println("Sent a message");
@@ -82,7 +87,7 @@ public class ClientThread extends Thread {
                 command = 1;
                 out = new byte[]{command};
                 dataOut.write(out);
-
+                Server.addLog("Requested username: " + message + ". Rejected - already in use.");
                 taken = true;
                 break;
             }
@@ -95,10 +100,13 @@ public class ClientThread extends Thread {
             command = 0;
             out = new byte[]{command};
             dataOut.write(out);
+            Server.addLog("Requested username: " + message + ". Accepted.");
 
             //System.out.println("index: " + usernameIndex);
             //System.out.println(Server.usernames.get(usernameIndex));
             String talkmsg = "- " + Server.usernames.get(usernameIndex) + " connected -";
+            timestamp = Instant.now();
+            Server.addLog(talkmsg + formatter.format(timestamp));
 
             talk(talkmsg);
 
@@ -109,6 +117,10 @@ public class ClientThread extends Thread {
     public void leaveServer(String message) throws UnsupportedEncodingException
     {
         talk("- "+Server.usernames.get(usernameIndex)+" disconnected -");
+        timestamp = Instant.now();
+        Server.addLog("- "+Server.usernames.get(usernameIndex)+" disconnected - "  + formatter.format(timestamp));
+        Server.clientNumberToRemove.add(usernameIndex);
+        return;
     }
 
     public void talk(String message) throws UnsupportedEncodingException
@@ -116,6 +128,8 @@ public class ClientThread extends Thread {
         byte command = (byte)2;
         byte[] msgData = stringToAscii(message);
         short msgLen = (short) message.length();
+
+        Server.addLog(message);
 
         Server.sendall(command, msgLen, msgData);
     }
