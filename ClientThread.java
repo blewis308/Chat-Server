@@ -109,6 +109,7 @@ public class ClientThread extends Thread {
     public void leaveServer(String message) throws UnsupportedEncodingException
     {
         talk("- "+Server.usernames.get(usernameIndex)+" disconnected -");
+        logFile.close();
     }
 
     public void talk(String message) throws UnsupportedEncodingException
