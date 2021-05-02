@@ -4,7 +4,7 @@ import java.time.*;
 import java.io.*;
 
 public class Logger extends Thread {
-    //private static PrintWriter logFile;
+    private static PrintWriter logFile;
     private Queue<String> logQueue = new LinkedList<>();
 
     //Empty constructor
@@ -39,7 +39,7 @@ public class Logger extends Thread {
 
     private static void printLog(String logStr){
         if (logStr != null){
-            System.out.printf("%s\n", logStr);
+            System.err.printf("%s\n", logStr);
             logFile.flush();
         }
         else {

@@ -2,21 +2,26 @@ import java.io.*;
 import java.net.*;
 import java.nio.ByteBuffer;
 import java.util.*;
+import java.util.logging.*;
+import java.util.logging.Logger;
 
 public class Server {
+    private static final Logger logger = Logger.getLogger("ChatServer");
     static ArrayList<ClientThread> clients;
     static ArrayList<String> usernames = new ArrayList<>();
     private int port = 9000; // default
-    public static Logger logKeeper;
     public static Queue clientNumberToRemove = new LinkedList<>();
     private RemoveClientThread removeClientThread;
+    private Handler fileHandler;
+    java.util.logging.Formatter basicFormat;
 
-    public Server(int port) throws FileNotFoundException{
+    public Server(int port) throws FileNotFoundException, IOException{
         this.port = port;
+        basicFormat = new SimpleFormatter();
+        fileHandler = new FileHandler("chatServer.log");
+        fileHandler.setFormatter(basicFormat);
         removeClientThread = new RemoveClientThread("Remove Client");
-        logKeeper = new Logger();
         clients = new ArrayList<ClientThread>();
-        logKeeper.start();
         removeClientThread.start();
     }
 
@@ -24,6 +29,8 @@ public class Server {
         try {
             ServerSocket ss = new ServerSocket(port);
             System.out.println("server started, waiting for client...");
+            logger.addHandler(fileHandler);
+            addLog("Started server.");
             while(true) {
                 Socket socket = ss.accept();
                 System.out.println("client accepted...");
@@ -35,9 +42,6 @@ public class Server {
         }
         catch (IOException e) {
             System.err.println("Exception in server: " + e);
-        }
-        finally {
-            logKeeper.closePrinter();
         }
     }
 
@@ -90,7 +94,7 @@ public class Server {
     }
 
     public static void addLog(String theStr){
-        logKeeper.addLog(theStr);
+        logger.info(theStr + "\n");
     }
 }
 
