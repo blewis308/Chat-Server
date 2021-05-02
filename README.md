@@ -23,7 +23,7 @@ Once you have selected your username, there are a few commands listed that are a
 This is what you just did, joining a chat server.
 
 #### **LEAVE**
-To leave a chat server, simply close the chat window by clicking the **X** in the top right.
+To leave a chat server, select the options tab in the top left, then click disconnect.
 
 #### **TALK**
 To talk in a chat server, type what you wish to talk and send your message using the enter key.

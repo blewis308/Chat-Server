@@ -65,10 +65,15 @@ public class Server {
             buffer.putShort(msglen);
             buffer.put(message);
 
+            //System.out.println("Before for loop");
+            //System.out.println(clients.size());
             for(int c = 0; c < clients.size(); c++)
             {
+                //System.out.println("Sending data for user #" + c);
                 clients.get(c).dataOut.write(buffer.array());
+                //System.out.println("Data sent for user #" + c);
             }
+            //System.out.println("After for loop");
         } catch (Exception e) {
             System.err.println(e);
         }
