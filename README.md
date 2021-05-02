@@ -16,6 +16,7 @@
 
 After running both server and client, and having connected to the server, you first enter your username in the textbox centered at the bottom.
 This can be any username you wish, so as it is only ascii characters.
+Close the server by using Ctrl + C.
 
 Once you have selected your username, there are a few commands listed that are available:
 
